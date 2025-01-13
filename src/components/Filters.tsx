@@ -1,61 +1,100 @@
 // src/components/Filters.tsx
 import React, { useState } from 'react';
+import { useNewsContext } from '../context/NewsContext';
 
-interface FiltersProps {
-  onSearch: (query: string) => void;
-  onFilterChange: (filters: { category: string; source: string; date: string }) => void;
-}
-
-export const Filters: React.FC<FiltersProps> = ({ onSearch, onFilterChange }) => {
-  const [query, setQuery] = useState('');
-  const [category, setCategory] = useState('');
+export const Filters: React.FC = () => {
+  const { setFilters, fetchArticles } = useNewsContext();
+  const [search, setSearch] = useState('');
+  const [category, setCategory] = useState('general');
   const [source, setSource] = useState('');
   const [date, setDate] = useState('');
 
-  const handleSearch = () => {
-    onSearch(query);
-    onFilterChange({ category, source, date });
+  const applyFilters = () => {
+    setFilters({
+      search,
+      categories: [category],
+      date,
+      sources: source ? [source] : [],
+    });
+    fetchArticles();
+  };
+
+  const clearFilters = () => {
+    setSearch('');
+    setCategory('general');
+    setSource('');
+    setDate('');
+    setFilters({
+      search: '',
+      categories: ['general'],
+      date: '',
+      sources: [],
+    });
+    fetchArticles();
   };
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-4 mb-4">
-      <div className="flex flex-col md:flex-row gap-4">
+    <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Search Input */}
         <input
           type="text"
           placeholder="Search articles..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="p-3 border border-gray-300 rounded-md w-full md:w-1/4"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+
+        {/* Category Dropdown */}
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="p-3 border border-gray-300 rounded-md w-full md:w-1/4"
+          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="">All Categories</option>
-          <option value="technology">Technology</option>
+          <option value="general">General</option>
           <option value="business">Business</option>
+          <option value="technology">Technology</option>
+          <option value="sports">Sports</option>
+          <option value="entertainment">Entertainment</option>
+          <option value="science">Science</option>
+          <option value="health">Health</option>
         </select>
+
+        {/* Source Dropdown */}
         <select
           value={source}
           onChange={(e) => setSource(e.target.value)}
-          className="p-3 border border-gray-300 rounded-md w-full md:w-1/4"
+          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">All Sources</option>
-          <option value="bbc-news">BBC News</option>
-          <option value="the-verge">The Verge</option>
+          <option value="The Guardian">The Guardian</option>
+          <option value="NewsAPI">NewsAPI</option>
         </select>
+
+        {/* Date Picker */}
         <input
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className="p-3 border border-gray-300 rounded-md w-full md:w-1/4"
+          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+      </div>
+
+      <div className="flex justify-end items-center gap-4 mt-6">
+        {/* Clear Button */}
         <button
-          onClick={handleSearch}
-          className="bg-primary text-white px-6 py-3 rounded-md hover:bg-accent transition w-full md:w-auto"
+          onClick={clearFilters}
+          className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
         >
-          Search
+          Clear
+        </button>
+
+        {/* Apply Button */}
+        <button
+          onClick={applyFilters}
+          className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+        >
+          Apply Filters
         </button>
       </div>
     </div>
