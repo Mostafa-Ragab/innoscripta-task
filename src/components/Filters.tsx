@@ -1,19 +1,26 @@
-// src/components/Filters.tsx
 import React, { useState } from 'react';
+import DatePicker from 'react-datepicker';
 import { useNewsStore } from '../context/NewsContext';
+import 'react-datepicker/dist/react-datepicker.css';
 
 export const Filters: React.FC = () => {
-  const { setFilters, fetchArticles,guardianCategories,newsApiCategories } = useNewsStore();
+  const { setFilters, fetchArticles, guardianCategories, newsApiCategories } = useNewsStore();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('general');
   const [source, setSource] = useState('');
-  const [date, setDate] = useState('');
-let categoriesLit = source === 'The Guardian' ? guardianCategories : newsApiCategories
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([new Date(), new Date()]);
+
+  const categoriesList = source === 'The Guardian' ? guardianCategories : newsApiCategories;
+
   const applyFilters = () => {
+    const formattedStartDate = dateRange[0] ? dateRange[0].toISOString().split('T')[0] : '';
+    const formattedEndDate = dateRange[1] ? dateRange[1].toISOString().split('T')[0] : '';
+
     setFilters({
       search,
       categories: [category],
-      date,
+      startDate: formattedStartDate,
+      endDate:formattedEndDate,
       sources: source ? [source] : [],
     });
     fetchArticles();
@@ -21,9 +28,9 @@ let categoriesLit = source === 'The Guardian' ? guardianCategories : newsApiCate
 
   const clearFilters = () => {
     setSearch('');
-    setCategory('general');
+    setCategory('');
     setSource('');
-    setDate('');
+    setDateRange([new Date(), new Date()]);
     setFilters({
       search: '',
       categories: ['general'],
@@ -51,9 +58,9 @@ let categoriesLit = source === 'The Guardian' ? guardianCategories : newsApiCate
           onChange={(e) => setCategory(e.target.value)}
           className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-           { categoriesLit.map((cat:{label:string,value:string}) => (
+          {categoriesList.map((cat: { label: string; value: string }) => (
             <option key={cat.value} value={cat.value}>
-             {cat.label}
+              {cat.label}
             </option>
           ))}
         </select>
@@ -69,13 +76,21 @@ let categoriesLit = source === 'The Guardian' ? guardianCategories : newsApiCate
           <option value="NewsAPI">NewsAPI</option>
         </select>
 
-        {/* Date Picker */}
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        {/* Date Range Picker */}
+        <div>
+          <DatePicker
+            selected={dateRange[0]}
+            onChange={(update: [Date | null, Date | null]) => {
+              setDateRange(update);
+            }}
+            startDate={dateRange[0]}
+            endDate={dateRange[1]}
+            selectsRange
+            isClearable
+            placeholderText="Select a date range"
+            className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+          />
+        </div>
       </div>
 
       <div className="flex justify-end items-center gap-4 mt-6">

@@ -27,14 +27,16 @@ interface NewsState {
   guardianCategories: any[];
   newsApiCategories: any[];
   
+  
 }
 
 export const useNewsStore = create<NewsState>((set, get) => ({
   articles: [],
   filters: {
     search: '',
-    categories: ['general'],
-    date: '',
+    categories: [''],
+    startDate: '',
+    endDate:'',
     sources: [],
     authors: [],
   },

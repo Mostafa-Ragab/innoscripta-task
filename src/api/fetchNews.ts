@@ -35,26 +35,38 @@ const NYT_API_URL = import.meta.env.VITE_NYT_API_URL;
 const validateSources = (sources: string[] = [], availableSources = ['NewsAPI', 'The Guardian']): string[] =>
   sources.length === 0 ? availableSources : sources.filter((source) => availableSources.includes(source));
 
-
 // Main function to fetch articles
 export const fetchAllArticles = async (filters: NewsFilters, page: number = 1) => {
   const sourcesToFetch = validateSources(filters.sources);
- // Extract category from filters
- const category =  filters.categories[0] ;
+  const category = filters.categories[0]; // Extract category from filters
 
   // Build an array of fetch promises based on sources to fetch
   const fetchPromises = sourcesToFetch.map((source) => {
-    if (source === 'NewsAPI') return fetchFromNewsAPI(filters.search, filters.date, page,category);
-    if (source === 'The Guardian') return fetchFromGuardianAPI(filters.search, filters.date, page,category);
-    return Promise.resolve({ articles: [], totalResults: 0 }); // Fallback in case of an unexpected source
+    if (source === 'NewsAPI') {
+      return fetchFromNewsAPI(filters.search, filters.startDate, filters.endDate, page, category);
+    }
+    if (source === 'The Guardian') {
+      return fetchFromGuardianAPI(filters.search, filters.startDate, filters.endDate, page, category);
+    }
+    return Promise.resolve({ articles: [], totalResults: 0 }); // Fallback for unexpected source
   });
 
-  // Fetch all sources concurrently
-  const results = await Promise.all(fetchPromises);
+  // Use Promise.allSettled to handle both resolved and rejected promises
+  const results = await Promise.allSettled(fetchPromises);
+
+  // Process results: Include only fulfilled promises
+  const successfulResults = results
+    .filter((result): result is PromiseFulfilledResult<{ articles: any[]; totalResults: number }> => result.status === 'fulfilled')
+    .map((result) => result.value);
 
   // Combine articles and calculate total results
-  const articles = results.flatMap((result) => result.articles);
-  const totalResults = Math.max(...results.map((result) => result.totalResults));
+  const articles = successfulResults.flatMap((result) => result.articles);
+  const totalResults = Math.max(...successfulResults.map((result) => result.totalResults));
+
+  // Log errors for debugging if needed
+  results
+    .filter((result): result is PromiseRejectedResult => result.status === 'rejected')
+    .forEach((error) => console.error('API Error:', error.reason));
 
   return {
     articles,
@@ -62,21 +74,18 @@ export const fetchAllArticles = async (filters: NewsFilters, page: number = 1) =
   };
 };
 
-const fetchFromNewsAPI = async (query: string, date: string, page: number,category:string) => {
+const fetchFromNewsAPI = async (query: string, startDate: string,endDate:string, page: number,category:string) => {
    // Use /top-headlines if a category is specified, otherwise fall back to /everything
-   const endpoint = category ? 'https://newsapi.org/v2/top-headlines' : 'https://newsapi.org/v2/everything';
-  const response = await axios.get(endpoint, {
+  const response = await axios.get('https://newsapi.org/v2/top-headlines', {
     params: {
       page, // Current page
-      q:  query, 
-      from: date || undefined,
-      to: date || undefined,
-      language: 'en',
-      sortBy: 'publishedAt',
+      q:  query ? query : 'news', 
+      from: startDate || undefined,
+      to: endDate || undefined,
       pageSize: 10, // Hardcoded page size
     
       apiKey: NEWS_API_KEY,
-      category: category || undefined,
+      category: category  || undefined,
     },
   });
   return {
@@ -85,16 +94,16 @@ const fetchFromNewsAPI = async (query: string, date: string, page: number,catego
   };
 };
 
-const fetchFromGuardianAPI = async (query: string, date: string, page: number,category:string) => {
+const fetchFromGuardianAPI = async (query: string,startDate: string,endDate:string, page: number,category:string) => {
   const response = await axios.get('https://content.guardianapis.com/search', {
     params: {
       q: query,
-      'from-date': date || undefined,
-      'to-date': date || undefined,
+      'from-date':startDate || undefined,
+       'to-date': endDate || undefined,
       pageSize: 10, // Hardcoded page size
       page, // Current page
       'api-key': GUARDIAN_API_KEY, 
-      section: category || undefined,
+      section: category !== 'general' && category || undefined,
     },
   });
   return {

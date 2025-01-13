@@ -18,7 +18,8 @@ export type NewsCategory =
   export interface NewsFilters {
     search: string; // Search query
     categories: NewsCategory[]; // Typed categories
-    date: string; // Date filter
+    startDate: string,
+  endDate:string,
     sources: NewsSource[]; // Typed sources
     page: number; // Page number for pagination
   }
