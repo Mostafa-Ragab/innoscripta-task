@@ -1,3 +1,5 @@
+
+
 export interface Article {
     title: string;          // Title of the news article
     description: string;    // Short description or excerpt
@@ -6,3 +8,4 @@ export interface Article {
     publishedAt: string;    // Publication date (ISO format string)
     source: string;         // News source (e.g., "BBC News")
   }
+

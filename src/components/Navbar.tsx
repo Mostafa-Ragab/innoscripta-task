@@ -1,73 +1,50 @@
 // src/components/Navbar.tsx
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FaBars, FaTimes } from 'react-icons/fa';
 
 export const Navbar: React.FC = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const toggleMenu = () => setIsMenuOpen((prev) => !prev);
+  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="bg-gray-800 text-white shadow-md fixed w-full z-10 top-0">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <h1 className="text-2xl font-bold">
-            <Link to="/">News Aggregator</Link>
-          </h1>
-
-          {/* Hamburger Menu Button (Visible on Mobile) */}
-          <div className="flex md:hidden">
-            <button
-              onClick={toggleMenu}
-              className="text-white hover:text-gray-300 focus:outline-none"
-            >
-              {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
-            </button>
-          </div>
-
-          {/* Navigation Links (Hidden on Mobile) */}
-          <div className="hidden md:flex space-x-6">
-            <Link
-              to="/"
-              className="hover:text-gray-300 transition"
-            >
-              Home
-            </Link>
-            <Link
-              to="/preferences"
-              className="hover:text-gray-300 transition"
-            >
-              Preferences
-            </Link>
-          </div>
+    <nav className="bg-blue-600 text-white shadow-md sticky top-0 z-20">
+      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+        {/* Logo */}
+        <div className="text-lg font-bold">
+          <Link to="/" className="hover:text-blue-200 transition">
+            News Aggregator
+          </Link>
         </div>
+
+        {/* Desktop Links */}
+        <div className="hidden md:flex items-center space-x-6">
+          <Link to="/" className="hover:text-blue-200 transition">
+            Home
+          </Link>
+          <Link to="/preferences" className="hover:text-blue-200 transition">
+            Preferences
+          </Link>
+        </div>
+
+        {/* Mobile Menu Toggle */}
+        <button
+          onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
+          className="md:hidden p-2 rounded bg-blue-700 hover:bg-blue-500"
+        >
+          {isMobileMenuOpen ? 'Close' : 'Menu'}
+        </button>
       </div>
 
       {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-gray-800 text-white shadow-lg border-t">
-          <ul className="flex flex-col space-y-2 p-4">
-            <li>
-              <Link
-                to="/"
-                className="hover:text-gray-300 transition"
-                onClick={toggleMenu}
-              >
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/preferences"
-                className="hover:text-gray-300 transition"
-                onClick={toggleMenu}
-              >
-                Preferences
-              </Link>
-            </li>
-          </ul>
+      {isMobileMenuOpen && (
+        <div className="md:hidden bg-blue-700 py-4">
+          <div className="flex flex-col items-center space-y-4">
+            <Link to="/" className="hover:text-blue-200 transition">
+              Home
+            </Link>
+            <Link to="/preferences" className="hover:text-blue-200 transition">
+              Preferences
+            </Link>
+          </div>
         </div>
       )}
     </nav>
