@@ -1,6 +1,11 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import {create} from 'zustand';
 import { fetchAllArticles } from '../api/fetchNews';
 import { NewsFilters } from '../types/NewsFilters';
+import {
+  guardianInitSections,
+  newsApiCategories,
+  nyTimesSections,
+} from '../utils/constants'
 
 interface NewsPreferences {
   favoriteCategories: string[];
@@ -8,88 +13,75 @@ interface NewsPreferences {
   favoriteAuthors: string[];
 }
 
-interface NewsContextProps {
+interface NewsState {
   articles: any[];
   filters: NewsFilters;
-  setFilters: React.Dispatch<React.SetStateAction<NewsFilters>>;
+  setFilters: (filters: NewsFilters) => void;
   fetchArticles: () => Promise<void>;
   preferences: NewsPreferences;
-  savePreferences: (newPreferences: NewsPreferences) => void;
+  savePreferences: (preferences: NewsPreferences) => void;
   page: number;
-  setPage: React.Dispatch<React.SetStateAction<number>>;
+  setPage: (page: number) => void;
   totalResults: number;
   loading: boolean;
+  guardianCategories: any[];
+  newsApiCategories: any[];
+  
 }
 
-export const NewsContext = createContext<NewsContextProps | null>(null);
-
-export const NewsProvider = ({ children }: { children: ReactNode }) => {
-  const [articles, setArticles] = useState<any[]>([]);
-  const [filters, setFilters] = useState<NewsFilters>({
+export const useNewsStore = create<NewsState>((set, get) => ({
+  articles: [],
+  filters: {
     search: '',
     categories: ['general'],
     date: '',
     sources: [],
     authors: [],
-  });
-  const [preferences, setPreferences] = useState<NewsPreferences>({
+  },
+  preferences: {
     favoriteCategories: ['general'],
     favoriteSources: [],
     favoriteAuthors: [],
-  });
-  const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [totalResults, setTotalResults] = useState(0);
-
-  const fetchArticles = async () => {
-    setLoading(true);
+  },
+  loading: false,
+  page: 1,
+  totalResults: 0,
+  
+  guardianCategories: guardianInitSections,
+  nyTimesCategories: nyTimesSections,
+  newsApiCategories: newsApiCategories,
+  setFilters: (filters) => set({ filters }),
+  fetchArticles: async () => {
+    const { filters, page } = get();
+    if (get().loading) return; // Prevent duplicate calls
+  
+    set({ loading: true });
     try {
+      console.log('filters',filters)
       const response = await fetchAllArticles(filters, page);
-      setArticles(response.articles);
-      setTotalResults(response.totalResults || 0);
+      set({
+        articles: response.articles,
+        totalResults: response.totalResults || 0,
+      });
+    } catch (error) {
+      console.error('Error fetching articles:', error);
     } finally {
-      setLoading(false);
+      set({ loading: false });
     }
-  };
+  },
 
-  const savePreferences = (newPreferences: NewsPreferences) => {
-    setPreferences(newPreferences);
-    localStorage.setItem('preferences', JSON.stringify(newPreferences));
-  };
+  savePreferences: (preferences) => {
+    set({ preferences });
+    localStorage.setItem('preferences', JSON.stringify(preferences));
+  },
 
-  useEffect(() => {
+  setPage: (page) => set({ page }),
+
+  // Load preferences from localStorage on initialization
+  ...(() => {
     const storedPreferences = localStorage.getItem('preferences');
-    if (storedPreferences) {
-      setPreferences(JSON.parse(storedPreferences));
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchArticles();
-  }, [filters, page]);
-
-  return (
-    <NewsContext.Provider
-      value={{
-        articles,
-        filters,
-        setFilters,
-        fetchArticles,
-        preferences,
-        savePreferences,
-        page,
-        setPage,
-        totalResults,
-        loading,
-      }}
-    >
-      {children}
-    </NewsContext.Provider>
-  );
-};
-
-export const useNewsContext = () => {
-  const context = useContext(NewsContext);
-  if (!context) throw new Error('useNewsContext must be used within a NewsProvider');
-  return context;
-};
+    return storedPreferences
+      ? { preferences: JSON.parse(storedPreferences) }
+      : {};
+  })(),
+}));

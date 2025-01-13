@@ -1,14 +1,14 @@
 // src/components/Filters.tsx
 import React, { useState } from 'react';
-import { useNewsContext } from '../context/NewsContext';
+import { useNewsStore } from '../context/NewsContext';
 
 export const Filters: React.FC = () => {
-  const { setFilters, fetchArticles } = useNewsContext();
+  const { setFilters, fetchArticles,guardianCategories,newsApiCategories } = useNewsStore();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('general');
   const [source, setSource] = useState('');
   const [date, setDate] = useState('');
-
+let categoriesLit = source === 'The Guardian' ? guardianCategories : newsApiCategories
   const applyFilters = () => {
     setFilters({
       search,
@@ -51,13 +51,11 @@ export const Filters: React.FC = () => {
           onChange={(e) => setCategory(e.target.value)}
           className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="general">General</option>
-          <option value="business">Business</option>
-          <option value="technology">Technology</option>
-          <option value="sports">Sports</option>
-          <option value="entertainment">Entertainment</option>
-          <option value="science">Science</option>
-          <option value="health">Health</option>
+           { categoriesLit.map((cat:{label:string,value:string}) => (
+            <option key={cat.value} value={cat.value}>
+             {cat.label}
+            </option>
+          ))}
         </select>
 
         {/* Source Dropdown */}

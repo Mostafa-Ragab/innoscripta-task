@@ -1,17 +1,26 @@
 import React, { useEffect } from 'react';
-import { useNewsContext } from '../context/NewsContext';
+import {  useNewsStore } from '../context/NewsContext';
+
 import { ArticleCard } from '../components/ArticleCard';
 import { Filters } from '../components/Filters';
 import { Loader } from '../components/Loader';
 import { Pagination } from '../components/Pagination';
 
 export const Home: React.FC = () => {
-  const { articles, fetchArticles, loading, filters, page } = useNewsContext();
+  const {
+    articles,
+    filters,
+ 
+    fetchArticles,
+    page,
+   
+    loading,
+  } = useNewsStore();
 
   // Fetch articles whenever filters or page changes
   useEffect(() => {
     fetchArticles();
-  }, [filters, page]);
+  }, [filters, page,fetchArticles]);
 
   return (
     <div className="bg-gray-100 min-h-screen">

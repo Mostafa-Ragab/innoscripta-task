@@ -4,11 +4,11 @@ import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { Home } from './pages/Home';
 import { Preferences } from './pages/Preferences';
-import { NewsProvider } from './context/NewsContext';
+
 
 function App() {
   return (
-    <NewsProvider>
+   
       <Router>
         <div className="flex flex-col min-h-screen">
           {/* Navbar */}
@@ -26,7 +26,7 @@ function App() {
           <Footer />
         </div>
       </Router>
-    </NewsProvider>
+   
   );
 }
 

@@ -10,7 +10,6 @@ const NYT_API_KEY = import.meta.env.VITE_NYT_API_KEY;
 const NYT_API_URL = import.meta.env.VITE_NYT_API_URL;
 
 
-console.log(NEWS_API_KEY,GUARDIAN_API_URL)
 
 
 // // Fetch from NYTimes
@@ -32,35 +31,52 @@ console.log(NEWS_API_KEY,GUARDIAN_API_URL)
 // };
 
 
+// Utility function to validate and determine which sources to fetch
+const validateSources = (sources: string[] = [], availableSources = ['NewsAPI', 'The Guardian']): string[] =>
+  sources.length === 0 ? availableSources : sources.filter((source) => availableSources.includes(source));
 
 
+// Main function to fetch articles
 export const fetchAllArticles = async (filters: NewsFilters, page: number = 1) => {
-  const query = buildQuery(filters) || 'news'; // Default query is "news"
+  const sourcesToFetch = validateSources(filters.sources);
+ // Extract category from filters
+ const category =  filters.categories[0] ;
 
-  const [newsAPI, guardian] = await Promise.all([
-    fetchFromNewsAPI(query, filters.date, page),
-    fetchFromGuardianAPI(query, filters.date, page),
-  ]);
+  // Build an array of fetch promises based on sources to fetch
+  const fetchPromises = sourcesToFetch.map((source) => {
+    if (source === 'NewsAPI') return fetchFromNewsAPI(filters.search, filters.date, page,category);
+    if (source === 'The Guardian') return fetchFromGuardianAPI(filters.search, filters.date, page,category);
+    return Promise.resolve({ articles: [], totalResults: 0 }); // Fallback in case of an unexpected source
+  });
 
-  const allArticles = [...newsAPI.articles, ...guardian.articles];
+  // Fetch all sources concurrently
+  const results = await Promise.all(fetchPromises);
+
+  // Combine articles and calculate total results
+  const articles = results.flatMap((result) => result.articles);
+  const totalResults = Math.max(...results.map((result) => result.totalResults));
 
   return {
-    articles: allArticles,
-    totalResults: Math.max(newsAPI.totalResults, guardian.totalResults), // Use the highest total results for pagination
+    articles,
+    totalResults,
   };
 };
 
-const fetchFromNewsAPI = async (query: string, date: string, page: number) => {
-  const response = await axios.get('https://newsapi.org/v2/everything', {
+const fetchFromNewsAPI = async (query: string, date: string, page: number,category:string) => {
+   // Use /top-headlines if a category is specified, otherwise fall back to /everything
+   const endpoint = category ? 'https://newsapi.org/v2/top-headlines' : 'https://newsapi.org/v2/everything';
+  const response = await axios.get(endpoint, {
     params: {
-      q: query,
+      page, // Current page
+      q:  query, 
       from: date || undefined,
       to: date || undefined,
       language: 'en',
       sortBy: 'publishedAt',
       pageSize: 10, // Hardcoded page size
-      page, // Current page
+    
       apiKey: NEWS_API_KEY,
+      category: category || undefined,
     },
   });
   return {
@@ -69,7 +85,7 @@ const fetchFromNewsAPI = async (query: string, date: string, page: number) => {
   };
 };
 
-const fetchFromGuardianAPI = async (query: string, date: string, page: number) => {
+const fetchFromGuardianAPI = async (query: string, date: string, page: number,category:string) => {
   const response = await axios.get('https://content.guardianapis.com/search', {
     params: {
       q: query,
@@ -77,7 +93,8 @@ const fetchFromGuardianAPI = async (query: string, date: string, page: number) =
       'to-date': date || undefined,
       pageSize: 10, // Hardcoded page size
       page, // Current page
-      'api-key': GUARDIAN_API_KEY,
+      'api-key': GUARDIAN_API_KEY, 
+      section: category || undefined,
     },
   });
   return {

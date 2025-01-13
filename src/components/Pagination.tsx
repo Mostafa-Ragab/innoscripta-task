@@ -1,9 +1,9 @@
 // src/components/Pagination.tsx
 import React from 'react';
-import { useNewsContext } from '../context/NewsContext';
+import {useNewsStore } from '../context/NewsContext';
 
 export const Pagination: React.FC = () => {
-  const { page, setPage, totalResults } = useNewsContext();
+  const { page, setPage, totalResults } =useNewsStore();
 
   const pageSize = 10; // Fixed number of articles per page
   const totalPages = Math.ceil(totalResults / pageSize);

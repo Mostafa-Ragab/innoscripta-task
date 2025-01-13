@@ -1,13 +1,13 @@
 // src/pages/Preferences.tsx
 import React, { useState } from 'react';
-import { useNewsContext } from '../context/NewsContext';
+import { useNewsStore } from '../context/NewsContext';
 
 const categories = ['general', 'business', 'technology', 'sports', 'entertainment', 'science', 'health'];
 const sources = ['BBC News', 'The Guardian', 'NY Times', 'NewsAPI'];
 const authors = ['John Doe', 'Jane Smith', 'Mike Johnson']; // Example authors
 
 export const Preferences: React.FC = () => {
-  const { preferences, savePreferences } = useNewsContext();
+  const { preferences, savePreferences } = useNewsStore();
   const [favoriteCategories, setFavoriteCategories] = useState(preferences.favoriteCategories);
   const [favoriteSources, setFavoriteSources] = useState(preferences.favoriteSources);
   const [favoriteAuthors, setFavoriteAuthors] = useState(preferences.favoriteAuthors);
