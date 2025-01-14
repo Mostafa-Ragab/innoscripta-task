@@ -1,11 +1,11 @@
-import {create} from 'zustand';
+import { create } from 'zustand';
 import { fetchAllArticles } from '../api/fetchNews';
 import { NewsFilters } from '../types/NewsFilters';
 import {
   guardianInitSections,
   newsApiCategories,
   nyTimesSections,
-} from '../utils/constants'
+} from '../utils/constants';
 
 interface NewsPreferences {
   favoriteCategories: string[];
@@ -16,18 +16,19 @@ interface NewsPreferences {
 interface NewsState {
   articles: any[];
   filters: NewsFilters;
-  setFilters: (filters: NewsFilters) => void;
-  fetchArticles: () => Promise<void>;
   preferences: NewsPreferences;
-  savePreferences: (preferences: NewsPreferences) => void;
-  page: number;
-  setPage: (page: number) => void;
-  totalResults: number;
-  loading: boolean;
   guardianCategories: any[];
   newsApiCategories: any[];
-  
-  
+  nyTimesCategories: any[];
+  loading: boolean;
+  page: number;
+  totalResults: number;
+
+  setFilters: (filters: NewsFilters) => void;
+  fetchArticles: (page?: number) => Promise<void>;
+  savePreferences: (preferences: NewsPreferences) => void;
+  setPage: (page: number) => void;
+  resetFilters: () => void;
 }
 
 export const useNewsStore = create<NewsState>((set, get) => ({
@@ -36,35 +37,32 @@ export const useNewsStore = create<NewsState>((set, get) => ({
     search: '',
     categories: [],
     startDate: '',
-    endDate:'',
+    endDate: '',
     sources: [],
     authors: [],
   },
   preferences: {
-    favoriteCategories: ['general'],
+    favoriteCategories: [],
     favoriteSources: [],
     favoriteAuthors: [],
   },
-  loading: false,
-  page: 1,
-  totalResults: 0,
-  
   guardianCategories: guardianInitSections,
   nyTimesCategories: nyTimesSections,
   newsApiCategories: newsApiCategories,
+  loading: false,
+  page: 1,
+  totalResults: 0,
+
   setFilters: (filters) => set({ filters }),
-  fetchArticles: async () => {
-    const { filters, page } = get();
-    if (get().loading) return; // Prevent duplicate calls
-  
+
+  fetchArticles: async (page = get().page) => {
+    const { filters, loading } = get();
+    if (loading) return; // Prevent duplicate calls
+
     set({ loading: true });
     try {
-      console.log('filters',filters)
-      const response = await fetchAllArticles(filters, page);
-      set({
-        articles: response.articles,
-        totalResults: response.totalResults || 0,
-      });
+      const { articles, totalResults } = await fetchAllArticles(filters, page);
+      set({ articles, totalResults });
     } catch (error) {
       console.error('Error fetching articles:', error);
     } finally {
@@ -73,17 +71,49 @@ export const useNewsStore = create<NewsState>((set, get) => ({
   },
 
   savePreferences: (preferences) => {
-    set({ preferences });
+    set((state) => ({
+      preferences,
+      filters: {
+        ...state.filters,
+        categories: preferences.favoriteCategories,
+        sources: preferences.favoriteSources,
+        authors: preferences.favoriteAuthors,
+      },
+    }));
     localStorage.setItem('preferences', JSON.stringify(preferences));
   },
 
   setPage: (page) => set({ page }),
 
+  resetFilters: () => {
+    const { preferences } = get();
+    set((state) => ({
+      filters: {
+        search: '',
+        categories: preferences.favoriteCategories || [],
+        startDate: '',
+        endDate: '',
+        sources: preferences.favoriteSources || [],
+        authors: preferences.favoriteAuthors || [],
+      },
+    }));
+  },
+
   // Load preferences from localStorage on initialization
   ...(() => {
     const storedPreferences = localStorage.getItem('preferences');
     return storedPreferences
-      ? { preferences: JSON.parse(storedPreferences) }
+      ? {
+          preferences: JSON.parse(storedPreferences),
+          filters: {
+            search: '',
+            categories: JSON.parse(storedPreferences).favoriteCategories || [],
+            startDate: '',
+            endDate: '',
+            sources: JSON.parse(storedPreferences).favoriteSources || [],
+            authors: JSON.parse(storedPreferences).favoriteAuthors || [],
+          },
+        }
       : {};
   })(),
 }));

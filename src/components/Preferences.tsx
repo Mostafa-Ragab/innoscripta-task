@@ -1,27 +1,52 @@
-import React, { useState } from 'react';
-import { usePreferencesStore } from '../context/preferencesStore';
+import React, { useState, useEffect } from 'react';
+import { useNewsStore } from '../context/NewsContext';
 import { useNavigate } from 'react-router-dom';
 
 const Preferences: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
   isOpen,
   onClose,
 }) => {
-  const { sources, categories, authors, setSources, setCategories, setAuthors } =
-    usePreferencesStore();
-  const [selectedSource, setSelectedSource] = useState<string>(sources[0] || '');
-  const [selectedCategory, setSelectedCategory] = useState<string>(categories[0] || '');
-  const [selectedAuthor, setSelectedAuthor] = useState<string>(authors[0] || '');
-  const navigate = useNavigate(); // Initialize navigate function
+  const { savePreferences, preferences } = useNewsStore(); // Access the store functions and preferences
+  const [selectedSource, setSelectedSource] = useState<string>(preferences.favoriteSources[0] || '');
+  const [selectedCategory, setSelectedCategory] = useState<string>(preferences.favoriteCategories[0] || '');
+  const [selectedAuthor, setSelectedAuthor] = useState<string>(preferences.favoriteAuthors[0] || '');
+  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
+  const navigate = useNavigate();
 
-  const savePreferences = () => {
-    setSources([selectedSource]);
-    setCategories([selectedCategory]);
-    setAuthors([selectedAuthor]);
+  // Update available categories based on selected source
+  useEffect(() => {
+    const categoriesBySource: { [key: string]: string[] } = {
+      NewsAPI: ['business', 'technology', 'sports', 'health', 'science'],
+      'The Guardian': ['world', 'politics', 'culture', 'science', 'environment'],
+    };
+    setAvailableCategories(categoriesBySource[selectedSource] || []);
+  }, [selectedSource]);
+
+  const handleSavePreferences = () => {
+    // Validate preferences before saving
+    if (!selectedSource) {
+      alert('Please select a source.');
+      return;
+    }
+    if (!selectedCategory) {
+      alert('Please select a category.');
+      return;
+    }
+
+    // Save preferences using store function
+    savePreferences({
+      favoriteSources: [selectedSource],
+      favoriteCategories: [selectedCategory],
+      favoriteAuthors: [selectedAuthor],
+    });
+
+    // Show confirmation and navigate
     alert('Preferences saved!');
-
-    onClose(); // Close the sidebar
-    navigate('/news-feed'); // Navigate to the news-feed page
+    onClose();
+    navigate('/news-feed');
   };
+
+  const isSaveDisabled = !selectedSource || !selectedCategory;
 
   return (
     <>
@@ -34,7 +59,7 @@ const Preferences: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
         <div className="p-6">
           <h2 className="text-lg font-semibold mb-6">Customize Your News Feed</h2>
 
-          {/* Sources */}
+          {/* Preferred Source */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">Preferred Source</label>
             <select
@@ -48,7 +73,7 @@ const Preferences: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
             </select>
           </div>
 
-          {/* Categories */}
+          {/* Preferred Category */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">Preferred Category</label>
             <select
@@ -57,15 +82,15 @@ const Preferences: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
               className="mt-1 block w-full p-2 border border-gray-300 rounded-lg"
             >
               <option value="">Select a category</option>
-              <option value="business">Business</option>
-              <option value="technology">Technology</option>
-              <option value="sports">Sports</option>
-              <option value="health">Health</option>
-              <option value="science">Science</option>
+              {availableCategories.map((category) => (
+                <option key={category} value={category}>
+                  {category.charAt(0).toUpperCase() + category.slice(1)}
+                </option>
+              ))}
             </select>
           </div>
 
-          {/* Author */}
+          {/* Preferred Author */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">Preferred Author</label>
             <input
@@ -79,8 +104,13 @@ const Preferences: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 
           {/* Save Button */}
           <button
-            onClick={savePreferences}
-            className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+            onClick={handleSavePreferences}
+            disabled={isSaveDisabled}
+            className={`w-full px-4 py-2 rounded-lg transition ${
+              isSaveDisabled
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-blue-500 text-white hover:bg-blue-600'
+            }`}
           >
             Save Preferences
           </button>

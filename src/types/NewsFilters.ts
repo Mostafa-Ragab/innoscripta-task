@@ -22,4 +22,5 @@ export type NewsCategory =
   endDate:string,
     sources: NewsSource[]; // Typed sources
     page: number; // Page number for pagination
+    author:[];
   }

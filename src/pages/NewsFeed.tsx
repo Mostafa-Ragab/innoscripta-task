@@ -1,40 +1,28 @@
-import React, { useEffect, useState } from 'react';
-import { usePreferencesStore } from '../context/preferencesStore'
-import { fetchAllArticles } from '../api/fetchNews';
+import React, { useEffect } from 'react';
+import { useNewsStore } from '../context/NewsContext';
+import { ArticleCard } from '../components/ArticleCard';
+import { Loader } from '../components/Loader';
 
 const NewsFeed: React.FC = () => {
-  const { sources, categories, authors } = usePreferencesStore();
-  const [articles, setArticles] = useState<any[]>([]);
+  const { articles, fetchArticles, loading } = useNewsStore();
 
   useEffect(() => {
-    const fetchArticles = async () => {
-      const personalizedArticles = await fetchAllArticles({
-        sources,
-        categories,
-        authors,
-        page: 1,
-      });
-      setArticles(personalizedArticles);
-    };
+    fetchArticles(); // Fetch articles on mount
+  }, [fetchArticles]);
 
-    fetchArticles();
-  }, [sources, categories, authors]);
-console.log('articles', articles,'sources, categories, authors',sources, categories, authors)
   return (
-    <div className="p-6 bg-white shadow-lg rounded-lg">
-      <h2 className="text-lg font-semibold mb-4">Your Personalized News Feed</h2>
-      {articles.length > 0 ? (
-        articles.map((article, index) => (
-          <div key={index} className="mb-4">
-            <h3 className="text-md font-bold">{article.title}</h3>
-            <p>{article.description}</p>
-          </div>
-        ))
+    <div className="container mx-auto p-4">
+      {loading ? (
+        <Loader />
       ) : (
-        <p>No articles found based on your preferences.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {articles.map((article, index) => (
+            <ArticleCard key={index} {...article} />
+          ))}
+        </div>
       )}
     </div>
   );
 };
 
-export default NewsFeed;
+export default NewsFeed

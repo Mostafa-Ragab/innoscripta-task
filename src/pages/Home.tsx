@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useNewsStore } from '../context/NewsContext';
 import { ArticleCard } from '../components/ArticleCard';
 import { Loader } from '../components/Loader';
-import { Pagination } from '../components/Pagination';
+
 
 export const Home: React.FC = () => {
   const { articles, filters, fetchArticles, page, loading } = useNewsStore();
