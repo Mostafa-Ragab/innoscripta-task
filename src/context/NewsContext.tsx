@@ -34,7 +34,7 @@ export const useNewsStore = create<NewsState>((set, get) => ({
   articles: [],
   filters: {
     search: '',
-    categories: [''],
+    categories: [],
     startDate: '',
     endDate:'',
     sources: [],

@@ -74,7 +74,7 @@ export const fetchAllArticles = async (filters: NewsFilters, page: number = 1) =
   };
 };
 
-const fetchFromNewsAPI = async (query: string, startDate: string,endDate:string, page: number,category:string) => {
+const fetchFromNewsAPI = async (query: string, startDate: string,endDate:string, page: number,category:string,author:string  ) => {
    // Use /top-headlines if a category is specified, otherwise fall back to /everything
   const response = await axios.get('https://newsapi.org/v2/top-headlines', {
     params: {
@@ -83,7 +83,7 @@ const fetchFromNewsAPI = async (query: string, startDate: string,endDate:string,
       from: startDate || undefined,
       to: endDate || undefined,
       pageSize: 10, // Hardcoded page size
-    
+      author:author || undefined,
       apiKey: NEWS_API_KEY,
       category: category  || undefined,
     },
@@ -94,12 +94,13 @@ const fetchFromNewsAPI = async (query: string, startDate: string,endDate:string,
   };
 };
 
-const fetchFromGuardianAPI = async (query: string,startDate: string,endDate:string, page: number,category:string) => {
+const fetchFromGuardianAPI = async (query: string,startDate: string,endDate:string, page: number,category:string,author:string ) => {
   const response = await axios.get('https://content.guardianapis.com/search', {
     params: {
       q: query,
       'from-date':startDate || undefined,
        'to-date': endDate || undefined,
+       author:author || undefined,
       pageSize: 10, // Hardcoded page size
       page, // Current page
       'api-key': GUARDIAN_API_KEY, 
