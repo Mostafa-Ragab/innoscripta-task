@@ -16,9 +16,7 @@ const NewsFeed: React.FC = () => {
         <Loader />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {articles.map((article, index) => (
-            <ArticleCard key={index} {...article} />
-          ))}
+            <ArticleCard  articles={articles} />
         </div>
       )}
     </div>

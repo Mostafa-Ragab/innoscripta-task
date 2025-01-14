@@ -23,11 +23,10 @@ export const Home: React.FC = () => {
       {loading ? (
         <Loader />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4 sm:px-6 lg:px-8 py-8">
-          {articles.map((article, index) => (
-            <ArticleCard key={index} {...article} />
-          ))}
-        </div>
+       
+            <ArticleCard  articles={articles} />
+       
+       
       )}
 
      
