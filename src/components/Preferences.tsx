@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNewsStore } from '../context/NewsContext';
 import { useNavigate } from 'react-router-dom';
-import { guardianInitSections, newsApiCategories } from '../utils/constants';
+
 
 const Preferences: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
   isOpen,
   onClose,
 }) => {
-  const { savePreferences, preferences } = useNewsStore();
-  const [selectedSource, setSelectedSource] = useState<string>(preferences.favoriteSources[0] || '');
-  const [selectedCategory, setSelectedCategory] = useState<string>(preferences.favoriteCategories[0] || '');
-  const [selectedAuthor, setSelectedAuthor] = useState<string>(preferences.favoriteAuthors[0] || '');
+  const { savePreferences,  preferences , guardianCategories, newsApiCategories, nyTimesCategories, sources  } = useNewsStore();
+  const [selectedSource, setSelectedSource] = useState<string>(preferences?.favoriteSources[0] || '');
+  const [selectedCategory, setSelectedCategory] = useState<string>(preferences?.favoriteCategories[0] || '');
+  const [selectedAuthor, setSelectedAuthor] = useState<string>(preferences?.favoriteAuthors[0] || '');
   const [availableCategories, setAvailableCategories] = useState<{ value: string; label: string }[]>([]);
   const navigate = useNavigate();
 
@@ -18,14 +18,18 @@ const Preferences: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
   useEffect(() => {
     const categoriesBySource: { [key: string]: { value: string; label: string }[] } = {
       NewsAPI: newsApiCategories,
-      'The Guardian': guardianInitSections,
+      'The Guardian': guardianCategories,
+      NYTimes: nyTimesCategories,
     };
+
     setAvailableCategories(categoriesBySource[selectedSource] || []);
+
     // Reset selected category if source changes
     if (!categoriesBySource[selectedSource]?.some((category) => category.value === selectedCategory)) {
       setSelectedCategory(''); // Reset category if it's invalid for the selected source
     }
   }, [selectedSource, selectedCategory]);
+  
 
   const handleSavePreferences = () => {
     savePreferences({
@@ -61,8 +65,11 @@ const Preferences: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
               className="mt-1 block w-full p-2 border border-gray-300 rounded-lg"
             >
               <option value="">Select a source</option>
-              <option value="NewsAPI">NewsAPI</option>
-              <option value="The Guardian">The Guardian</option>
+              {sources.map((source) => (
+                <option key={source.value} value={source.value}>
+                  {source.label}
+                </option>
+              ))}
             </select>
           </div>
 

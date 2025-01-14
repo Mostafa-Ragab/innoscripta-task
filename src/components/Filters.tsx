@@ -1,16 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import { useNewsStore } from '../context/NewsContext';
 import 'react-datepicker/dist/react-datepicker.css';
 
 export const Filters: React.FC = () => {
-  const { setFilters, fetchArticles, guardianCategories, newsApiCategories } = useNewsStore();
+  const { setFilters, resetFilters,fetchArticles, guardianCategories, newsApiCategories, nyTimesCategories, sources } = useNewsStore();
   const [search, setSearch] = useState('');
-  const [category, setCategory] = useState('general');
+  const [category, setCategory] = useState('');
   const [source, setSource] = useState('');
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([new Date(), new Date()]);
+  const [categoriesList, setCategoriesList] = useState<{ label: string; value: string }[]>([]);
 
-  const categoriesList = source === 'The Guardian' ? guardianCategories : newsApiCategories;
+  // Update categories list dynamically based on selected source
+  useEffect(() => {
+    const categoriesBySource: { [key: string]: { label: string; value: string }[] } = {
+      'The Guardian': guardianCategories,
+      NewsAPI: newsApiCategories,
+      NYTimes: nyTimesCategories,
+    };
+
+    setCategoriesList(categoriesBySource[source] || []);
+    if (!categoriesBySource[source]?.some((cat) => cat.value === category)) {
+      setCategory(''); // Reset category if the selected source changes and the category is invalid
+    }
+  }, [source, category, guardianCategories, newsApiCategories, nyTimesCategories]);
 
   const applyFilters = () => {
     const formattedStartDate = dateRange[0] ? dateRange[0].toISOString().split('T')[0] : '';
@@ -18,9 +31,9 @@ export const Filters: React.FC = () => {
 
     setFilters({
       search,
-      categories: [category],
+      categories: category ? [category] : [],
       startDate: formattedStartDate,
-      endDate:formattedEndDate,
+      endDate: formattedEndDate,
       sources: source ? [source] : [],
     });
     fetchArticles();
@@ -30,13 +43,8 @@ export const Filters: React.FC = () => {
     setSearch('');
     setCategory('');
     setSource('');
-    setDateRange([new Date(), new Date()]);
-    setFilters({
-      search: '',
-      categories: ['general'],
-      date: '',
-      sources: [],
-    });
+    setDateRange([null, null]);
+    resetFilters()
     fetchArticles();
   };
 
@@ -52,19 +60,6 @@ export const Filters: React.FC = () => {
           className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
-        {/* Category Dropdown */}
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          {categoriesList.map((cat: { label: string; value: string }) => (
-            <option key={cat.value} value={cat.value}>
-              {cat.label}
-            </option>
-          ))}
-        </select>
-
         {/* Source Dropdown */}
         <select
           value={source}
@@ -72,8 +67,26 @@ export const Filters: React.FC = () => {
           className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">All Sources</option>
-          <option value="The Guardian">The Guardian</option>
-          <option value="NewsAPI">NewsAPI</option>
+          {sources.map((src) => (
+            <option key={src.value} value={src.value}>
+              {src.label}
+            </option>
+          ))}
+        </select>
+
+        {/* Category Dropdown */}
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          disabled={!source} // Disable if no source is selected
+        >
+          <option value="">Select a category</option>
+          {categoriesList.map((cat) => (
+            <option key={cat.value} value={cat.value}>
+              {cat.label}
+            </option>
+          ))}
         </select>
 
         {/* Date Range Picker */}

@@ -5,12 +5,17 @@ import { Loader } from '../components/Loader';
 
 
 export const Home: React.FC = () => {
-  const { articles, filters, fetchArticles, page, loading,setFilters } = useNewsStore();
+  const { articles, filters,fetchArticles, page, loading } = useNewsStore();
+
+  console.log('filters',filters)
 
   // Fetch articles whenever filters or page changes
   useEffect(() => {
-    
+   
+   
     fetchArticles(false); // Fetch articles without preferences
+
+    // 
   }, [filters, page, fetchArticles]);
 
   return (

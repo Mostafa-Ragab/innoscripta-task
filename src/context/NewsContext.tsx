@@ -2,10 +2,11 @@ import { create } from 'zustand';
 import { fetchAllArticles } from '../api/fetchNews';
 import { NewsFilters } from '../types/NewsFilters';
 import {
-  guardianInitSections,
-  newsApiCategories,
-  nyTimesSections,
-} from '../utils/constants';
+  guardianInitSectionsList,
+  newsApiCategoriesList,
+  nyTimesSectionsList,
+  sourcesList,
+} from '../constants/constants';
 
 interface NewsPreferences {
   favoriteCategories: string[];
@@ -16,19 +17,20 @@ interface NewsPreferences {
 interface NewsState {
   articles: any[];
   filters: NewsFilters;
-  preferences: NewsPreferences;
+  preferences: NewsPreferences ;
   guardianCategories: any[];
   newsApiCategories: any[];
   nyTimesCategories: any[];
   loading: boolean;
   page: number;
   totalResults: number;
-
+  sources: any[];
   setFilters: (filters: NewsFilters) => void;
   fetchArticles: (applyPreferences?: boolean, page?: number) => Promise<void>;
   savePreferences: (preferences: NewsPreferences) => void;
   setPage: (page: number) => void;
   resetFilters: () => void;
+ 
 }
 
 export const useNewsStore = create<NewsState>((set, get) => ({
@@ -45,41 +47,49 @@ export const useNewsStore = create<NewsState>((set, get) => ({
     favoriteCategories: [],
     favoriteSources: [],
     favoriteAuthors: [],
-  },
-  guardianCategories: guardianInitSections,
-  nyTimesCategories: nyTimesSections,
-  newsApiCategories: newsApiCategories,
+  }, 
+  guardianCategories: guardianInitSectionsList,
+  nyTimesCategories: nyTimesSectionsList,
+  sources: sourcesList,
+  newsApiCategories: newsApiCategoriesList,
   loading: false,
   page: 1,
   totalResults: 0,
 
-  setFilters: (filters) => set({ filters }),
+  setFilters: (filters) =>
+    set((state) => ({
+      filters: {
+        ...state.filters,
+        ...filters,
+      },
+    })),
 
   fetchArticles: async (applyPreferences = false, page = get().page) => {
-    const { filters, preferences, loading } = get();
+    const { filters, preferences,loading } = get();
     if (loading) return; // Prevent duplicate calls
 
-    const effectiveFilters = applyPreferences
+    
+
+    // Construct effective filters
+    const effectiveFilters: NewsFilters = applyPreferences 
       ? {
           ...filters,
-          categories: filters.categories.length
-            ? filters.categories
-            : preferences.favoriteCategories,
-          sources: filters.sources.length
-            ? filters.sources
-            : preferences.favoriteSources,
-          authors: preferences.favoriteAuthors.length ? preferences.favoriteAuthors : undefined, // Only use authors from preferences
+          categories: preferences.favoriteCategories.length
+            ? preferences.favoriteCategories
+            : filters.categories,
+          sources: preferences.favoriteSources.length
+            ? preferences.favoriteSources
+            : filters.sources,
+          authors: preferences.favoriteAuthors.length
+            ? preferences.favoriteAuthors
+            : undefined, // Use authors only from preferences
+            startDate: '',
+        endDate: '',
         }
-      : {
-          search: '',
-          categories: [], // Default to no categories
-          startDate: '',
-          endDate: '',
-          sources: [], // Default to all sources
-          authors: undefined, // Ignore authors entirely
-        };
+      : filters;
 
     set({ loading: true });
+
     try {
       const { articles, totalResults } = await fetchAllArticles(effectiveFilters, page);
       set({ articles, totalResults });
@@ -91,49 +101,43 @@ export const useNewsStore = create<NewsState>((set, get) => ({
   },
 
   savePreferences: (preferences) => {
-    set((state) => ({
+    set({
       preferences,
       filters: {
-        ...state.filters,
-        categories: preferences.favoriteCategories,
-        sources: preferences.favoriteSources,
-        authors: preferences.favoriteAuthors,
+        ...get().filters,
+        
       },
-    }));
+    });
     localStorage.setItem('preferences', JSON.stringify(preferences));
   },
+   // Initialize preferences
+   ...(() => {
+    const storedPreferences = localStorage.getItem('preferences');
+    if (storedPreferences) {
+      const parsedPreferences: NewsPreferences = JSON.parse(storedPreferences);
+      return {
+        preferences: parsedPreferences,
+      };
+    }
+    return  {
+      favoriteCategories: [],
+      favoriteSources: [],
+      favoriteAuthors: [],
+    };
+  })(),
 
-  setPage: (page) => set({ page }),
-
+  
   resetFilters: () => {
-    const { preferences } = get();
     set({
       filters: {
         search: '',
-        categories: preferences.favoriteCategories || [],
+        categories: [],
         startDate: '',
         endDate: '',
-        sources: preferences.favoriteSources || [],
-        authors: undefined, // Ensure authors are reset to undefined
+        sources:  [],
+        authors: undefined, // Reset author
       },
     });
+    
   },
-
-  // Load preferences from localStorage on initialization
-  ...(() => {
-    const storedPreferences = localStorage.getItem('preferences');
-    return storedPreferences
-      ? {
-          preferences: JSON.parse(storedPreferences),
-          filters: {
-            search: '',
-            categories: JSON.parse(storedPreferences).favoriteCategories || [],
-            startDate: '',
-            endDate: '',
-            sources: JSON.parse(storedPreferences).favoriteSources || [],
-            authors: undefined, // Set authors to undefined initially
-          },
-        }
-      : {};
-  })(),
 }));
