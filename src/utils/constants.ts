@@ -88,7 +88,6 @@ export const newsApiCategories = [
   export const guardianInitSections = [
     { value: 'culture', label: 'culture' },
     { value: 'books', label: 'books' },
-    { value: 'culture', label: 'culture' },
     { value: 'fashion', label: 'fashion' },
   
 

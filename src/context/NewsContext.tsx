@@ -25,7 +25,7 @@ interface NewsState {
   totalResults: number;
 
   setFilters: (filters: NewsFilters) => void;
-  fetchArticles: (page?: number) => Promise<void>;
+  fetchArticles: (applyPreferences?: boolean, page?: number) => Promise<void>;
   savePreferences: (preferences: NewsPreferences) => void;
   setPage: (page: number) => void;
   resetFilters: () => void;
@@ -55,13 +55,33 @@ export const useNewsStore = create<NewsState>((set, get) => ({
 
   setFilters: (filters) => set({ filters }),
 
-  fetchArticles: async (page = get().page) => {
-    const { filters, loading } = get();
+  fetchArticles: async (applyPreferences = false, page = get().page) => {
+    const { filters, preferences, loading } = get();
     if (loading) return; // Prevent duplicate calls
+
+    const effectiveFilters = applyPreferences
+      ? {
+          ...filters,
+          categories: filters.categories.length
+            ? filters.categories
+            : preferences.favoriteCategories,
+          sources: filters.sources.length
+            ? filters.sources
+            : preferences.favoriteSources,
+          authors: preferences.favoriteAuthors.length ? preferences.favoriteAuthors : undefined, // Only use authors from preferences
+        }
+      : {
+          search: '',
+          categories: [], // Default to no categories
+          startDate: '',
+          endDate: '',
+          sources: [], // Default to all sources
+          authors: undefined, // Ignore authors entirely
+        };
 
     set({ loading: true });
     try {
-      const { articles, totalResults } = await fetchAllArticles(filters, page);
+      const { articles, totalResults } = await fetchAllArticles(effectiveFilters, page);
       set({ articles, totalResults });
     } catch (error) {
       console.error('Error fetching articles:', error);
@@ -87,16 +107,16 @@ export const useNewsStore = create<NewsState>((set, get) => ({
 
   resetFilters: () => {
     const { preferences } = get();
-    set((state) => ({
+    set({
       filters: {
         search: '',
         categories: preferences.favoriteCategories || [],
         startDate: '',
         endDate: '',
         sources: preferences.favoriteSources || [],
-        authors: preferences.favoriteAuthors || [],
+        authors: undefined, // Ensure authors are reset to undefined
       },
-    }));
+    });
   },
 
   // Load preferences from localStorage on initialization
@@ -111,7 +131,7 @@ export const useNewsStore = create<NewsState>((set, get) => ({
             startDate: '',
             endDate: '',
             sources: JSON.parse(storedPreferences).favoriteSources || [],
-            authors: JSON.parse(storedPreferences).favoriteAuthors || [],
+            authors: undefined, // Set authors to undefined initially
           },
         }
       : {};

@@ -1,49 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import { useNewsStore } from '../context/NewsContext';
 import { useNavigate } from 'react-router-dom';
+import { guardianInitSections, newsApiCategories } from '../utils/constants';
 
 const Preferences: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
   isOpen,
   onClose,
 }) => {
-  const { savePreferences, preferences } = useNewsStore(); // Access the store functions and preferences
+  const { savePreferences, preferences } = useNewsStore();
   const [selectedSource, setSelectedSource] = useState<string>(preferences.favoriteSources[0] || '');
   const [selectedCategory, setSelectedCategory] = useState<string>(preferences.favoriteCategories[0] || '');
   const [selectedAuthor, setSelectedAuthor] = useState<string>(preferences.favoriteAuthors[0] || '');
-  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
+  const [availableCategories, setAvailableCategories] = useState<{ value: string; label: string }[]>([]);
   const navigate = useNavigate();
 
   // Update available categories based on selected source
   useEffect(() => {
-    const categoriesBySource: { [key: string]: string[] } = {
-      NewsAPI: ['business', 'technology', 'sports', 'health', 'science'],
-      'The Guardian': ['world', 'politics', 'culture', 'science', 'environment'],
+    const categoriesBySource: { [key: string]: { value: string; label: string }[] } = {
+      NewsAPI: newsApiCategories,
+      'The Guardian': guardianInitSections,
     };
     setAvailableCategories(categoriesBySource[selectedSource] || []);
-  }, [selectedSource]);
+    // Reset selected category if source changes
+    if (!categoriesBySource[selectedSource]?.some((category) => category.value === selectedCategory)) {
+      setSelectedCategory(''); // Reset category if it's invalid for the selected source
+    }
+  }, [selectedSource, selectedCategory]);
 
   const handleSavePreferences = () => {
-    // Validate preferences before saving
-    if (!selectedSource) {
-      alert('Please select a source.');
-      return;
-    }
-    if (!selectedCategory) {
-      alert('Please select a category.');
-      return;
-    }
-
-    // Save preferences using store function
     savePreferences({
       favoriteSources: [selectedSource],
       favoriteCategories: [selectedCategory],
       favoriteAuthors: [selectedAuthor],
     });
 
-    // Show confirmation and navigate
     alert('Preferences saved!');
     onClose();
-    navigate('/news-feed');
+    navigate('/news-feed'); // Navigate to the news-feed page
   };
 
   const isSaveDisabled = !selectedSource || !selectedCategory;
@@ -80,11 +73,12 @@ const Preferences: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
               className="mt-1 block w-full p-2 border border-gray-300 rounded-lg"
+              disabled={!selectedSource} // Disable dropdown if no source is selected
             >
               <option value="">Select a category</option>
               {availableCategories.map((category) => (
-                <option key={category} value={category}>
-                  {category.charAt(0).toUpperCase() + category.slice(1)}
+                <option key={category.value} value={category.value}>
+                  {category.label}
                 </option>
               ))}
             </select>
