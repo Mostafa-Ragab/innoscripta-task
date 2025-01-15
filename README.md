@@ -1,22 +1,63 @@
-# News Aggregator App - Docker Setup Guide
+# Innoscripta Task
 
-This guide explains how to run the News Aggregator app using Docker. Follow the steps below to build and start the application in a containerized environment.
-
----
-
-## Prerequisites
-
-Ensure the following tools are installed on your machine:
-
-1. **Docker**: [Install Docker](https://docs.docker.com/get-docker/)
-2. **Docker Compose** (optional, depending on your setup): Comes with Docker Desktop.
+This repository contains the solution for the Innoscripta Task. The project demonstrates modern web development practices using React, TypeScript, and Docker for containerization.
 
 ---
 
-## Steps to Run the App
+## Table of Contents
 
-### 1. Clone the Repository
-Clone the repository to your local machine:
-```bash
-git clone https://github.com/Mostafa-Ragab/innoscripta-task.git
-cd innoscripta-task
+- [Technologies Used](#technologies-used)
+- [Project Structure](#project-structure)
+- [Setup and Installation](#setup-and-installation)
+- [Running the Project](#running-the-project)
+  - [Using Docker](#using-docker)
+  - [Running Locally (Without Docker)](#running-locally-without-docker)
+- [License](#license)
+
+---
+
+## Technologies Used
+
+This project is built using the following technologies:
+
+- **Frontend:**
+  - [React](https://reactjs.org/) - A JavaScript library for building user interfaces.
+  - [TypeScript](https://www.typescriptlang.org/) - Superset of JavaScript that adds static typing.
+  - [React Router DOM](https://reactrouter.com/) - Handles routing in the application.
+  - [React Query](https://tanstack.com/query/latest) - Data-fetching and state management.
+  - [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework.
+  - [axios](https://axios-http.com/) - HTTP client for API communication.
+
+- **Tooling:**
+  - [Vite](https://vitejs.dev/) - Next-generation frontend tooling.
+  - [pnpm](https://pnpm.io/) - Fast, disk space-efficient package manager.
+  - [ESLint](https://eslint.org/) - JavaScript and TypeScript linting.
+  - [Prettier](https://prettier.io/) - Code formatting.
+  - [Docker](https://www.docker.com/) - Containerization platform for the application.
+
+---
+
+## Project Structure
+
+The repository follows a structured and modular architecture to ensure scalability and maintainability.
+
+```plaintext
+├── public/              # Static files (e.g., images, icons)
+├── src/
+│   ├── components/      # Reusable UI components
+│   ├── hooks/           # Custom hooks for shared logic
+│   ├── pages/           # Page components for routing
+│   ├── services/        # API interaction and logic
+│   ├── styles/          # Global and component-specific styles
+│   ├── utils/           # Utility functions
+│   ├── App.tsx          # Root component
+│   ├── main.tsx         # Entry point for the React app
+├── .eslintrc            # ESLint configuration
+├── .prettierrc          # Prettier configuration
+├── docker-compose.yml   # Docker Compose configuration
+├── Dockerfile           # Dockerfile for containerizing the application
+├── package.json         # Dependencies and scripts
+├── README.md            # Project documentation
+├── tailwind.config.js   # Tailwind CSS configuration
+├── tsconfig.json        # TypeScript configuration
+└── vite.config.ts       # Vite configuration
