@@ -76,5 +76,3 @@ docker run --name innoscripta-container -d -p 3000:80 innoscripta-task
 3. ** Access the Application
 Once the container is running, open your browser and navigate to:
 http://localhost:3000
-
-

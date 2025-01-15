@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { FaRegNewspaper } from 'react-icons/fa'; // Importing a better news icon
 import Preferences from './Preferences';
 
 export const Navbar: React.FC = () => {
@@ -15,10 +16,11 @@ export const Navbar: React.FC = () => {
       {/* Navbar */}
       <nav className="bg-white shadow-lg sticky top-0 z-20">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          {/* Logo */}
-          <div className="text-xl font-bold text-gray-800">
+          {/* Logo with Icon */}
+          <div className="flex items-center space-x-2 text-xl font-bold text-gray-800">
+            <FaRegNewspaper className="text-red-600 text-2xl" /> {/* Better News Icon */}
             <Link to="/" className="hover:text-red-600 transition">
-             Innoscripta News 
+              Innoscripta News
             </Link>
           </div>
 
