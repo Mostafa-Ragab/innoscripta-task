@@ -1,6 +1,6 @@
 import React from 'react';
 import noData from '../assets/no-data.png';
-import noImage from '../assets/no-image.png';
+import noImage from '../assets/No-Image-Placeholder.svg';
 import { Article } from '../types/news';
 
 interface ArticleCardProps {
@@ -35,15 +35,15 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({ articles }) => {
       {articles.map((article, index) => (
         <div
           key={index}
-          className="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-2"
+          className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300 transform hover:-translate-y-2"
         >
           {/* Image Section */}
           <a href={article.url} target="_blank" rel="noopener noreferrer" className="block">
-            <div className="relative">
+            <div className="relative h-52 w-full">
               <img
                 src={article.urlToImage || noImage}
                 alt={article.title}
-                className="w-full h-52 object-cover"
+                className="absolute inset-0 w-full h-full object-cover"
               />
               <span className="absolute top-2 right-2 bg-red-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
                 {article.source}
@@ -54,7 +54,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({ articles }) => {
           {/* Content Section */}
           <div className="p-5">
             {/* Title */}
-            <h2 className="text-lg font-bold text-gray-900 mb-3 leading-snug line-clamp-2">
+            <h2 className="text-lg font-bold text-gray-800 mb-3 leading-snug line-clamp-2">
               <a
                 href={article.url}
                 target="_blank"

@@ -1,7 +1,6 @@
-import React from 'react';
+
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Home } from './pages/Home';
-import Preferences from './components/Preferences'
 import NewsFeed from './pages/NewsFeed';
 import Layout from './components/Layout';
 

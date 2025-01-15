@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { NEWS_API_URL  } from '../constants';
-import { normalizeArticles } from '../utils';
+import { normalizeArticles } from '../utils/helpers';
 
 const NEWS_API_KEY = import.meta.env.VITE_NEWS_API_KEY;
 

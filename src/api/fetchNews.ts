@@ -1,5 +1,5 @@
 import { Article, NewsFilters } from '../types/news';
-import { validateSources } from '../utils';
+import { validateSources } from '../utils/helpers';
 import { fetchFromNewsAPI } from './NewsApi';
 import { fetchFromGuardianAPI } from './GuardianApi';
 import { fetchFromNYTimesAPI } from './NYTimesApi';

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { GUARDIAN_API_URL } from '../constants';
-import { normalizeArticles } from '../utils';
+import { normalizeArticles } from '../utils/helpers';
 
 const GUARDIAN_API_KEY = import.meta.env.VITE_GUARDIAN_API_KEY;
 
