@@ -61,3 +61,20 @@ The repository follows a structured and modular architecture to ensure scalabili
 ├── tailwind.config.js   # Tailwind CSS configuration
 ├── tsconfig.json        # TypeScript configuration
 └── vite.config.ts       # Vite configuration
+
+
+## Running the Project
+
+### Using Docker
+
+1. ** Build the Docker Image:
+docker build -t innoscripta-task .
+
+2. ** Run the Docker Container
+docker run --name innoscripta-container -d -p 3000:80 innoscripta-task
+
+3. ** Access the Application
+Once the container is running, open your browser and navigate to:
+http://localhost:3000
+
+
