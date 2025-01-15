@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNewsStore } from '../context/NewsContext';
+import { useNewsStore } from '../store/NewsStore';
 import { useNavigate } from 'react-router-dom';
 
 

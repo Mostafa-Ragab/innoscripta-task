@@ -1,6 +1,6 @@
 // src/components/Pagination.tsx
 import React from 'react';
-import {useNewsStore } from '../context/NewsContext';
+import {useNewsStore } from '../store/NewsStore';
 
 export const Pagination: React.FC = () => {
   const { page, setPage, totalResults } =useNewsStore();

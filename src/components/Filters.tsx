@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
-import { useNewsStore } from '../context/NewsContext';
+import { useNewsStore } from '../store/NewsStore';
 import 'react-datepicker/dist/react-datepicker.css';
+import { Option } from '../types/news';
 
 export const Filters: React.FC = () => {
   const { setFilters, resetFilters,fetchArticles, guardianCategories, newsApiCategories, nyTimesCategories, sources } = useNewsStore();
@@ -9,7 +10,7 @@ export const Filters: React.FC = () => {
   const [category, setCategory] = useState('');
   const [source, setSource] = useState('');
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([new Date(), new Date()]);
-  const [categoriesList, setCategoriesList] = useState<{ label: string; value: string }[]>([]);
+  const [categoriesList, setCategoriesList] = useState<Option[]>([]);
 
   // Update categories list dynamically based on selected source
   useEffect(() => {

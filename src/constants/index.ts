@@ -1,4 +1,6 @@
-export const newsApiCategoriesList = [
+import { Option } from "../types/news";
+
+export const newsApiCategoriesList: Option[] = [
     { value: 'general', label: 'General' },
     { value: 'business', label: 'Business' },
     { value: 'entertainment', label: 'Entertainment' },
@@ -8,7 +10,7 @@ export const newsApiCategoriesList = [
     { value: 'technology', label: 'Technology' },
   ];
   
-  export const nyTimesSectionsList = [
+  export const nyTimesSectionsList: Option[] = [
     { label: 'Arts', value: 'Arts' },
     { label: 'Automobiles', value: 'Automobiles' },
     { label: 'Autos', value: 'Autos' },
@@ -33,7 +35,7 @@ export const newsApiCategoriesList = [
   
 
   
-  export const guardianInitSectionsList = [
+  export const guardianInitSectionsList: Option[] = [
     { value: 'culture', label: 'culture' },
     { value: 'books', label: 'books' },
     { value: 'fashion', label: 'fashion' },
@@ -42,25 +44,14 @@ export const newsApiCategoriesList = [
    
   ];
 
-  export const sourcesList = [
+  export const sourcesList: Option[] = [
     { value: 'NewsAPI', label: 'NewsAPI' },
     { value: 'The Guardian', label: 'The Guardian' },
     { value: 'NYTimes', label: 'NYTimes' },
+  ];
   
+  export const AVAILABLE_SOURCES = ['NewsAPI', 'The Guardian', 'NYTimes'];
 
-   
-  ];
-  
-  
-  export const allApisFilters = [
-    'q',
-    'category',
-    'section',
-    'from-date',
-    'to-date',
-    'begin_date',
-    'end_date',
-    'fq',
-    'page',
-  ];
-  
+ export const NEWS_API_URL = 'https://newsapi.org/v2/top-headlines';
+export const GUARDIAN_API_URL = 'https://content.guardianapis.com/search';
+export const NYT_API_URL = 'https://api.nytimes.com/svc/search/v2/articlesearch.json';

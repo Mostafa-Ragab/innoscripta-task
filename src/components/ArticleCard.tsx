@@ -1,14 +1,7 @@
 import React from 'react';
 import noData from '../assets/no-data.png'
 import noImage from '../assets/no-image.png'
-interface Article {
-  title: string;
-  description: string;
-  url: string;
-  urlToImage: string;
-  source: string;
-  publishedAt: string;
-}
+import { Article } from '../types/news';
 
 interface ArticleCardProps {
   articles: Article[];

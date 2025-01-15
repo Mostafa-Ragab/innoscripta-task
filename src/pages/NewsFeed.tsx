@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useNewsStore } from '../context/NewsContext';
+import { useNewsStore } from '../store/NewsStore';
 import { ArticleCard } from '../components/ArticleCard';
 import { Loader } from '../components/Loader';
 

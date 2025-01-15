@@ -1,48 +1,18 @@
 import { create } from 'zustand';
 import { fetchAllArticles } from '../api/fetchNews';
-import { NewsFilters } from '../types/NewsFilters';
+import { NewsFilters ,NewsState,NewsPreferences } from '../types/news';
 import {
   guardianInitSectionsList,
   newsApiCategoriesList,
   nyTimesSectionsList,
   sourcesList,
-} from '../constants/constants';
+} from '../constants';
 
-interface NewsPreferences {
-  favoriteCategories: string[];
-  favoriteSources: string[];
-  favoriteAuthors: string[];
-}
 
-interface NewsState {
-  articles: any[];
-  filters: NewsFilters;
-  preferences: NewsPreferences ;
-  guardianCategories: any[];
-  newsApiCategories: any[];
-  nyTimesCategories: any[];
-  loading: boolean;
-  page: number;
-  totalResults: number;
-  sources: any[];
-  setFilters: (filters: NewsFilters) => void;
-  fetchArticles: (applyPreferences?: boolean, page?: number) => Promise<void>;
-  savePreferences: (preferences: NewsPreferences) => void;
-  setPage: (page: number) => void;
-  resetFilters: () => void;
- 
-}
 
 export const useNewsStore = create<NewsState>((set, get) => ({
   articles: [],
-  filters: {
-    search: '',
-    categories: [],
-    startDate: '',
-    endDate: '',
-    sources: [],
-    authors: [],
-  },
+ 
   preferences: {
     favoriteCategories: [],
     favoriteSources: [],
@@ -55,7 +25,14 @@ export const useNewsStore = create<NewsState>((set, get) => ({
   loading: false,
   page: 1,
   totalResults: 0,
-
+  filters: {
+    search: '',
+    categories: [],
+    startDate: '',
+    endDate: '',
+    sources: [],
+    authors: [],
+  },
   setFilters: (filters) =>
     set((state) => ({
       filters: {
@@ -126,11 +103,16 @@ export const useNewsStore = create<NewsState>((set, get) => ({
     };
   })(),
 
-  
+  setPage: (page:number) => {
+    set({
+     page
+    });
+  }, 
   resetFilters: () => {
     set({
       filters: {
         search: '',
+        page:1,
         categories: [],
         startDate: '',
         endDate: '',
