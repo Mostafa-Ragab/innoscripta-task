@@ -1,22 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { useNewsStore } from '../store/NewsStore';
 import { useNavigate } from 'react-router-dom';
-
+import { Option } from '../types/news';
 
 const Preferences: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
   isOpen,
   onClose,
 }) => {
-  const { savePreferences,  preferences , guardianCategories, newsApiCategories, nyTimesCategories, sources  } = useNewsStore();
-  const [selectedSource, setSelectedSource] = useState<string>(preferences?.favoriteSources[0] || '');
-  const [selectedCategory, setSelectedCategory] = useState<string>(preferences?.favoriteCategories[0] || '');
-  const [selectedAuthor, setSelectedAuthor] = useState<string>(preferences?.favoriteAuthors[0] || '');
-  const [availableCategories, setAvailableCategories] = useState<{ value: string; label: string }[]>([]);
+  const {
+    savePreferences,
+    preferences,
+    guardianCategories,
+    newsApiCategories,
+    nyTimesCategories,
+    sources,
+  } = useNewsStore();
+
+  const [selectedSource, setSelectedSource] = useState<string>(
+    preferences?.favoriteSources[0] || ''
+  );
+  const [selectedCategory, setSelectedCategory] = useState<string>(
+    preferences?.favoriteCategories[0] || ''
+  );
+  const [selectedAuthor, setSelectedAuthor] = useState<string>(
+    preferences?.favoriteAuthors[0] || ''
+  );
+  const [availableCategories, setAvailableCategories] = useState<Option[]>([]);
   const navigate = useNavigate();
 
-  // Update available categories based on selected source
   useEffect(() => {
-    const categoriesBySource: { [key: string]: { value: string; label: string }[] } = {
+    const categoriesBySource: { [key: string]: Option[] } = {
       NewsAPI: newsApiCategories,
       'The Guardian': guardianCategories,
       NYTimes: nyTimesCategories,
@@ -25,11 +38,14 @@ const Preferences: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
     setAvailableCategories(categoriesBySource[selectedSource] || []);
 
     // Reset selected category if source changes
-    if (!categoriesBySource[selectedSource]?.some((category) => category.value === selectedCategory)) {
-      setSelectedCategory(''); // Reset category if it's invalid for the selected source
+    if (
+      !categoriesBySource[selectedSource]?.some(
+        (category) => category.value === selectedCategory
+      )
+    ) {
+      setSelectedCategory('');
     }
   }, [selectedSource, selectedCategory]);
-  
 
   const handleSavePreferences = () => {
     savePreferences({
@@ -40,7 +56,7 @@ const Preferences: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 
     alert('Preferences saved!');
     onClose();
-    navigate('/news-feed'); // Navigate to the news-feed page
+    navigate('/news-feed');
   };
 
   const isSaveDisabled = !selectedSource || !selectedCategory;
@@ -49,20 +65,24 @@ const Preferences: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
     <>
       {/* Sidebar */}
       <div
-        className={`fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-40 ${
+        className={`fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform transition-transform duration-500 ease-in-out z-40 ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         <div className="p-6">
-          <h2 className="text-lg font-semibold mb-6">Customize Your News Feed</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">
+            Customize Your News Feed
+          </h2>
 
           {/* Preferred Source */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Preferred Source</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Preferred Source
+            </label>
             <select
               value={selectedSource}
               onChange={(e) => setSelectedSource(e.target.value)}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-lg"
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:outline-none"
             >
               <option value="">Select a source</option>
               {sources.map((source) => (
@@ -75,12 +95,14 @@ const Preferences: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 
           {/* Preferred Category */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Preferred Category</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Preferred Category
+            </label>
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-lg"
-              disabled={!selectedSource} // Disable dropdown if no source is selected
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:outline-none"
+              disabled={!selectedSource}
             >
               <option value="">Select a category</option>
               {availableCategories.map((category) => (
@@ -93,13 +115,15 @@ const Preferences: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 
           {/* Preferred Author */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Preferred Author</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Preferred Author
+            </label>
             <input
               type="text"
               value={selectedAuthor}
               onChange={(e) => setSelectedAuthor(e.target.value)}
               placeholder="Enter author's name"
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-lg"
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:outline-none"
             />
           </div>
 
@@ -107,10 +131,10 @@ const Preferences: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
           <button
             onClick={handleSavePreferences}
             disabled={isSaveDisabled}
-            className={`w-full px-4 py-2 rounded-lg transition ${
+            className={`w-full px-4 py-2 rounded-lg font-medium text-white transition ${
               isSaveDisabled
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-blue-500 text-white hover:bg-blue-600'
+                ? 'bg-gray-300 cursor-not-allowed'
+                : 'bg-red-600 hover:bg-red-700'
             }`}
           >
             Save Preferences
@@ -121,7 +145,7 @@ const Preferences: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
       {/* Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-30"
+          className="fixed inset-0 bg-black bg-opacity-50 z-30 transition-opacity duration-300"
           onClick={onClose}
         ></div>
       )}

@@ -17,7 +17,7 @@ export const Navbar: React.FC = () => {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           {/* Logo */}
           <div className="text-xl font-bold text-gray-800">
-            <Link to="/" className="hover:text-gray-600 transition">
+            <Link to="/" className="hover:text-red-600 transition">
               News Aggregator
             </Link>
           </div>
@@ -26,25 +26,23 @@ export const Navbar: React.FC = () => {
           <div className="hidden md:flex items-center space-x-6">
             <Link
               to="/"
-              className={`hover:text-gray-600 transition ${
-                isActive('/') ? 'text-blue-600 font-semibold' : 'text-gray-800'
+              className={`hover:text-red-600 transition ${
+                isActive('/') ? 'text-red-600 font-semibold' : 'text-gray-800'
               }`}
             >
               Home
             </Link>
             <Link
               to="/news-feed"
-              className={`hover:text-gray-600 transition ${
-                isActive('/news-feed')
-                  ? 'text-blue-600 font-semibold'
-                  : 'text-gray-800'
+              className={`hover:text-red-600 transition ${
+                isActive('/news-feed') ? 'text-red-600 font-semibold' : 'text-gray-800'
               }`}
             >
               News Feed
             </Link>
             <button
               onClick={() => setIsPreferencesOpen(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
             >
               Preferences
             </button>
@@ -54,7 +52,7 @@ export const Navbar: React.FC = () => {
           <div className="md:hidden">
             <button
               onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-              className="p-2 rounded bg-gray-100 border border-gray-300 hover:bg-gray-200 transition"
+              className="p-2 rounded bg-red-600 text-white hover:bg-red-700 transition"
             >
               <span className="material-icons">
                 {isMobileMenuOpen ? 'close' : 'menu'}
@@ -71,8 +69,8 @@ export const Navbar: React.FC = () => {
         >
           <Link
             to="/"
-            className={`text-lg font-semibold hover:text-gray-600 transition ${
-              isActive('/') ? 'text-blue-600' : 'text-gray-800'
+            className={`text-lg font-semibold hover:text-red-600 transition ${
+              isActive('/') ? 'text-red-600' : 'text-gray-800'
             }`}
             onClick={() => setIsMobileMenuOpen(false)}
           >
@@ -80,8 +78,8 @@ export const Navbar: React.FC = () => {
           </Link>
           <Link
             to="/news-feed"
-            className={`text-lg font-semibold hover:text-gray-600 transition ${
-              isActive('/news-feed') ? 'text-blue-600' : 'text-gray-800'
+            className={`text-lg font-semibold hover:text-red-600 transition ${
+              isActive('/news-feed') ? 'text-red-600' : 'text-gray-800'
             }`}
             onClick={() => setIsMobileMenuOpen(false)}
           >
@@ -92,7 +90,7 @@ export const Navbar: React.FC = () => {
               setIsPreferencesOpen(true);
               setIsMobileMenuOpen(false);
             }}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
           >
             Preferences
           </button>

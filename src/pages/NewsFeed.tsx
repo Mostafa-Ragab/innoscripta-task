@@ -15,9 +15,9 @@ const NewsFeed: React.FC = () => {
       {loading ? (
         <Loader />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+       
             <ArticleCard  articles={articles} />
-        </div>
+     
       )}
     </div>
   );
