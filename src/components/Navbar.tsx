@@ -18,7 +18,7 @@ export const Navbar: React.FC = () => {
           {/* Logo */}
           <div className="text-xl font-bold text-gray-800">
             <Link to="/" className="hover:text-red-600 transition">
-              News Aggregator
+             Innoscripta News 
             </Link>
           </div>
 
